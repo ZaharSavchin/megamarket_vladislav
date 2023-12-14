@@ -15,20 +15,22 @@ def get_other_shops(browser: webdriver.Chrome,
 
     browser.execute_script("window.scrollBy(0, 700)")
 
-    time.sleep(4)
+    time.sleep(2)
 
     try:
         browser.find_element(By.CSS_SELECTOR, 'a.more-offers-button.offers-info__more-offers-button-wrapper').click()
-        time.sleep(3)
+        time.sleep(2)
     except Exception as err:
-        print(err)
+        print('2')
 
     others = browser.find_elements(By.CSS_SELECTOR, 'div.product-offer.product-offer_with-payment-method')
 
     for shop_ in others:
         try:
             price_ = shop_.find_element(By.CLASS_NAME, 'product-offer-price__amount').text
+            price_ = int(''.join(price_.split(' ')[:-1]))
             cashback_ = shop_.find_element(By.CLASS_NAME, 'bonus-amount').text
+            cashback_ = int(''.join(cashback_.split(' ')))
             delivery_ = shop_.find_element(By.CLASS_NAME, 'offer-item-delivery-type__delivery-date').text
             pay_format_ = shop_.find_element(By.CLASS_NAME, 'pdp-available-payment-method-block__text').text
             shop_item = shop_.find_element(By.CLASS_NAME, 'pdp-merchant-rating-block__merchant-name').text
@@ -43,4 +45,4 @@ def get_other_shops(browser: webdriver.Chrome,
             pay_format.append(pay_format_)
             shop.append(shop_item)
         except Exception as err:
-            print(err)
+            print('3')

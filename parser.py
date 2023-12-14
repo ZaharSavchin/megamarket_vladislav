@@ -31,9 +31,19 @@ with webdriver.Chrome(service=ChromiumService(ChromeDriverManager().install())) 
     for link in links:
         try:
             browser.get(link)
-            time.sleep(3)
+            time.sleep(2)
 
             items_links.append(link)
+
+            try:
+                browser.switch_to.frame("fl-520224")
+                time.sleep(2)
+                browser.find_element(By.CSS_SELECTOR, 'button.close.js-close.active').click()
+                time.sleep(1)
+                browser.switch_to.default_content()
+                time.sleep(1)
+            except Exception as err:
+                print('1')
 
             try:
                 price_ = browser.find_element(By.CLASS_NAME, 'sales-block-offer-price__price-final').text
@@ -108,7 +118,7 @@ with webdriver.Chrome(service=ChromiumService(ChromeDriverManager().install())) 
                 print(err)
 
         except Exception as err:
-            items_links.append(None)
+            items_links.append(link)
             price.append(None)
             cashback.append(None)
             cashback_other.append(None)
