@@ -11,27 +11,53 @@ from other_shops import get_other_shops
 
 workbook = load_workbook(filename='megamarket.xlsx')
 sheet = workbook.active
-links = []
+
+
+links_ = []
 for cell in sheet['A']:
-    links.append(cell.value)
+    links_.append(cell.value)
+
+links = []
 
 
-items_links = []
-price = []
-cashback = []
-cashback_other = []
-cashback_sber = []
-delivery = []
-pay_format = []
-shop = []
+items_links = [None]
+price = [None]
+cashback = [None]
+cashback_other = [None]
+cashback_sber = [None]
+delivery = [None]
+pay_format = [None]
+shop = [None]
+attrs = [None]
 
 
 with webdriver.Chrome(service=ChromiumService(ChromeDriverManager().install())) as browser:
 
+    print(links_[1])
+    # time.sleep(5)
+    pages = int(links_[0])
+    for i in range(1, pages + 1):
+        lin = str(links_[1]).replace('/page-1', f'/page-{i}')
+
+        print(lin)
+        browser.get(lin)
+        # time.sleep(3)
+        lk = browser.find_elements(By.CLASS_NAME, 'catalog-item-mobile')
+        print(len(lk))
+        for l in lk:
+            links.append(l.find_element(By.TAG_NAME, 'a').get_attribute('href'))
+        # time.sleep(2)
+
+    counter = len(links)
+    print(counter)
+    
+    browser.maximize_window()
+
     for link in links:
+        print(f'осталось - {counter}')
         try:
             browser.get(link)
-            time.sleep(2)
+            # time.sleep(2)
 
             items_links.append(link)
 
@@ -101,22 +127,30 @@ with webdriver.Chrome(service=ChromiumService(ChromeDriverManager().install())) 
                 shop_ = None
                 shop.append(None)
 
+            try:
+                attr = browser.find_element(By.CLASS_NAME, "pdp-regular-attrs__characteristics").text
+                attrs.append(attr)
+                print(attr)
+            except Exception:
+                attr = None
+                attrs.append(None)
+
             print(f'{link[:10]} = {price_}р, {cashback_}, {delivery_}, {pay_format_}, {shop_}')
 
-            try:
-                get_other_shops(browser,
-                                items_links,
-                                price,
-                                cashback,
-                                cashback_other,
-                                cashback_sber,
-                                delivery,
-                                pay_format,
-                                shop
-                                )
-            except Exception as err:
-                print(err)
-
+            # try:
+            #     get_other_shops(browser,
+            #                     items_links,
+            #                     price,
+            #                     cashback,
+            #                     cashback_other,
+            #                     cashback_sber,
+            #                     delivery,
+            #                     pay_format,
+            #                     shop
+            #                     )
+            # except Exception as err:
+            #     print(err)
+            counter -= 1
         except Exception as err:
             items_links.append(link)
             price.append(None)
@@ -127,6 +161,7 @@ with webdriver.Chrome(service=ChromiumService(ChromeDriverManager().install())) 
             pay_format.append(None)
             shop.append(None)
             print(f'{link} = товар не найден')
+            counter -= 1
 
 for i in range(len(items_links)):
     sheet.cell(row=i+1, column=2, value=items_links[i])
@@ -151,5 +186,8 @@ for i in range(len(pay_format)):
 
 for i in range(len(shop)):
     sheet.cell(row=i+1, column=9, value=shop[i])
+
+for i in range(len(attrs)):
+    sheet.cell(row=i+1, column=10, value=attrs[i])
 
 workbook.save(filename='megamarket.xlsx')
