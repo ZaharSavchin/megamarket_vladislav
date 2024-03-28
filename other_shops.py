@@ -29,8 +29,11 @@ def get_other_shops(browser: webdriver.Chrome,
         try:
             price_ = shop_.find_element(By.CLASS_NAME, 'product-offer-price__amount').text
             price_ = int(''.join(price_.split(' ')[:-1]))
-            cashback_ = shop_.find_element(By.CLASS_NAME, 'bonus-amount').text
-            cashback_ = int(''.join(cashback_.split(' ')))
+            try:
+                cashback_ = shop_.find_element(By.CLASS_NAME, 'bonus-amount').text
+                cashback_ = int(''.join(cashback_.split(' ')))
+            except Exception as err:
+                cashback_ = None
             delivery_ = shop_.find_element(By.CLASS_NAME, 'offer-item-delivery-type__delivery-date').text
             pay_format_ = shop_.find_element(By.CLASS_NAME, 'pdp-available-payment-method-block__text').text
             shop_item = shop_.find_element(By.CLASS_NAME, 'pdp-merchant-rating-block__merchant-name').text
